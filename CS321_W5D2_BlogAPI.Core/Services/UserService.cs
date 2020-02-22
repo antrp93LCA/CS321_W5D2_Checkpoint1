@@ -21,10 +21,10 @@ namespace CS321_W5D2_BlogAPI.Core.Services
             }
         }
 
-        //public string GetUser()
-        //{
-        //    return _context.HttpContext.User?.Identity?.Name;
-        //}
+        public string GetUser()
+        {
+            return _context.HttpContext.User?.Identity?.Name;
+        }
 
         public string CurrentUserId
         {

@@ -1,6 +1,6 @@
-﻿using System;
+﻿using CS321_W5D2_BlogAPI.Core.Models;
+using System;
 using System.Collections.Generic;
-using CS321_W5D2_BlogAPI.Core.Models;
 
 namespace CS321_W5D2_BlogAPI.Core.Services
 {
@@ -19,11 +19,17 @@ namespace CS321_W5D2_BlogAPI.Core.Services
 
         public Post Add(Post newPost)
         {
-            // TODO: Prevent users from adding to a blog that isn't theirs
-            //     Use the _userService to get the current users id.
-            //     You may have to retrieve the blog in order to check user id
-            // TODO: assign the current date to DatePublished
+            var currentUserId = _userService.CurrentUserId;
+
+            var blog = _blogRepository.Get(newPost.BlogId);
+
+            if (currentUserId != blog.UserId)
+            {
+                throw new ApplicationException("You are unauthorized to add to this blog");
+            }
+            newPost.DatePublished = DateTime.Now;
             return _postRepository.Add(newPost);
+                
         }
 
         public Post Get(int id)
@@ -35,7 +41,7 @@ namespace CS321_W5D2_BlogAPI.Core.Services
         {
             return _postRepository.GetAll();
         }
-        
+
         public IEnumerable<Post> GetBlogPosts(int blogId)
         {
             return _postRepository.GetBlogPosts(blogId);
@@ -43,16 +49,39 @@ namespace CS321_W5D2_BlogAPI.Core.Services
 
         public void Remove(int id)
         {
-            var post = this.Get(id);
-            // TODO: prevent user from deleting from a blog that isn't theirs
+            var post = Get(id);
+
+            //var currentBlog = post.BlogId;
+            
+            // prevent user from deleting from a blog that isn't theirs
+           
+            var currentUser = _userService.CurrentUserId;
+
+            
+
+            if(post.Blog.UserId != currentUser)
+            {
+                throw new ApplicationException("You are unauthorized to remove this blog");
+            }
+
             _postRepository.Remove(id);
         }
 
         public Post Update(Post updatedPost)
         {
-            // TODO: prevent user from updating a blog that isn't theirs
+            // prevent user from updating a blog that isn't theirs
+
+            // variable to hold UserId
+            var currentUser = _userService.CurrentUserId;
+
+
+
+            
+            if(currentUser != updatedPost.Blog.UserId)
+            {
+                throw new ApplicationException("You are unauthorized to update this blog");
+            }
             return _postRepository.Update(updatedPost);
         }
-
     }
 }
